@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"></meta>
+<link href="css/bootstrap.min.css" rel="stylesheet"></link>
+<link href="css/font-awesome.min.css" rel="stylesheet"></link>
+<link href="css/prettyPhoto.css" rel="stylesheet"></link>
+<link href="css/price-range.css" rel="stylesheet"></link>
+<link href="css/animate.css" rel="stylesheet"></link>
+<link href="css/main.css" rel="stylesheet"></link>
+<link href="css/responsive.css" rel="stylesheet"></link>
+
+<title>Exemplo Echo WebSocket</title>
+
+<script type="text/javascript">
+	var ws = new WebSocket("wss://ljmchatv3.herokuapp.com/chat");
+	
+	ws.onopen = function() {
+		console.log('Info: WebSocket conectado.');
+	};
+	
+	function echo(message) {
+		
+		var usuario = document.getElementById("usuarios").value;
+		
+		message = '{"destino":"'+usuario+'","texto":"'+message+'"}';
+		
+		if (ws != null) {
+
+			ws.send(message);
+
+		} else {
+			alert('WebSocket não conectado');
+		}
+	}
+	
+	ws.onmessage = function(event) {
+		//console.log('Mensagem recebida: ' + event.data);
+		//document.getElementById('conteudo').innerHtml
+		addTexto(event.data);
+	};
+
+	function addTexto(texto) {
+		var br = document.createElement("br");
+		var conteudo = document.getElementById("conteudo");
+
+		var t = document.createTextNode(texto);
+
+		conteudo.appendChild(t);
+
+		conteudo.appendChild(br);
+	}
+	
+	ws.onclose = function() {
+		console.log('Info: WebSocket desconectado.');
+	};
+</script>
+
+</head>
+
+<body>
+
+	<div class="form-group blu-margin">
+		<select id="usuarios" class="form-control" th:field="${usuarios}">
+			<option th:each="u:${usuarios}" th:value="${u}" th:text="${u}"></option>
+		</select>
+	</div>
+
+	<span id="conteudo"></span>
+
+	<p>
+		<textarea id="message" rows="4" cols="150"></textarea>
+
+		<button id="echo"
+			onclick="echo(document.getElementById('message').value);">Enviar mensagem...</button>
+	</p>
+
+</body>
+
+</html>
